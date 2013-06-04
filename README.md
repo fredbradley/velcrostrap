@@ -1,3 +1,2 @@
-velcrostrap
+VelcroStrap
 ===========
-Test
