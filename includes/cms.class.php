@@ -36,16 +36,48 @@
 	*  Functions */
 
 	function __construct() {
-	$connection = mysql_connect(DBHOST, DBUSER, DBPASS)
+		$connection = mysql_connect(DBHOST, DBUSER, DBPASS)
             or die("Could not connect to the database:<br />" . mysql_error());
         mysql_select_db(DBNAME, $connection) 
             or die("Database error:<br />" . mysql_error());
+
 	}
-	
+	function logged_in() {
+		if (!empty($_SESSION['username'])) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	function dbquery($query) {
+		return mysql_query($query);
+	}
 	function refresh() {
 		header("Location: ".$_SERVER['HTTP_REFERER']);
 	}
-	
+
+	function saveOAuthDetails($user_info, $access_token) {
+		$query = mysql_query("SELECT * FROM ".DBPREFIX."users WHERE oauth_provider = 'twitter' AND oauth_uid = ". $user_info->id);  
+		$result = mysql_fetch_array($query);  
+    
+		// If not, let's add it to the database  
+		if(empty($result)){  
+			$query = mysql_query("INSERT INTO ".DBPREFIX."users (oauth_provider, oauth_uid, username, oauth_token, oauth_secret) VALUES ('twitter', {$user_info->id}, '{$user_info->screen_name}', '{$access_token['oauth_token']}', '{$access_token['oauth_token_secret']}')");  
+			$query = mysql_query("SELECT * FROM ".DBPREFIX."users WHERE id = " . mysql_insert_id());  
+			$result = mysql_fetch_array($query);  
+		} else {  
+			// Update the tokens  
+			$query = mysql_query("UPDATE ".DBPREFIX."users SET oauth_token = '{$access_token['oauth_token']}', oauth_secret = '{$access_token['oauth_token_secret']}' WHERE oauth_provider = 'twitter' AND oauth_uid = {$user_info->id}");  
+		}
+		$_SESSION['id'] = $result['id']; 
+		$_SESSION['username'] = $result['username']; 
+		$_SESSION['oauth_uid'] = $result['oauth_uid']; 
+		$_SESSION['oauth_provider'] = $result['oauth_provider']; 
+		$_SESSION['oauth_token'] = $result['oauth_token']; 
+		$_SESSION['oauth_secret'] = $result['oauth_secret']; 
+		
+	}
+
 	function getSettings() {
 		$configs = "SELECT * FROM ".DBPREFIX."site_configs";
 		$result = mysql_query($configs);
@@ -55,8 +87,8 @@
 		return $output;
 	}
 
-	function get_results($query) {
-	
+	function get_mysql_array($result) {
+		return mysql_fetch_array($result);
 	}
 	function getUsers() {
 	global $db;
@@ -295,6 +327,4 @@ limited. All Rights Reserved.<br />
 
 }
 
-
 ?>
-

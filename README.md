@@ -27,5 +27,11 @@ Folder Structure
  - /plugins/ - Default local plugins frolder from Smarty
 
 
+db.inc.php
+-----------
+    define('DBHOST', '');   // Database Host
+    define('DBUSER', '');   // Database User
+    define('DBPASS', '');   // Database Password
+    define('DBNAME', '');   // Database Name
+    define('DBPREFIX', ''); // Prefix on the tables (like `wp_`)
 
-    
