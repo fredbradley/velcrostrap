@@ -60,8 +60,15 @@ $smarty = new Smarty;
 require_once($SITE_PATH."includes/twitteroauth.php");
 if ($cms->logged_in()){
     $twitteroauth = new TwitterOAuth(CONSUMER_KEY, CONSUMER_SECRET, $_SESSION['oauth_token'], $_SESSION['oauth_secret']);
-    $smarty->assign("USERNAME", $_SESSION['username']);
+    $user = $cms->getUser($_SESSION['id']);
+    if (empty($user->email)) {
+	    $smarty->assign("update_email", true);
+    }
+//  $message = "This is a test tweet! (Yes I'm coding again!)".time();
+//	$cms->updateTwitter($message);
+	$smarty->assign("USERNAME", $_SESSION['username']);
 	$smarty->assign("logged_in", true);
+	
 } else {
 	$smarty->assign("logged_in", false);
 }

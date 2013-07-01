@@ -17,9 +17,6 @@ if(!empty($_GET['oauth_verifier']) && !empty($_SESSION['oauth_token']) && !empty
 	// Let's get the user's info 
 	$user_info = $twitteroauth->get('account/verify_credentials'); 
 	// Print user's info  
-	//echo "<pre>";
-//	print_r($user_info);
-//	echo "</pre>";
 	
 	if(isset($user_info->error)){
 		// Something's wrong, go back to square 1  
@@ -27,12 +24,7 @@ if(!empty($_GET['oauth_verifier']) && !empty($_SESSION['oauth_token']) && !empty
 	} else { 
 		// Let's find the user by its ID  
 		$cms->saveOAuthDetails($user_info, $access_token);
-	//	echo "<hr />";
-	//	echo "<pre>";
-	//	var_dump($_SESSION);
-	//	echo "</pre>";
-	//	var_dump($cms->logged_in());
-		header('Location: index.php');  
+		header('Location: ./index.php');  
 	}
 } else {  
     // Something's missing, go back to square 1  

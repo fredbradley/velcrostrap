@@ -10,7 +10,6 @@
  *
  * Note:  
  */
-
 	class CMS
 	{
 		var $num_queries      = 0;
@@ -49,16 +48,13 @@
 			return false;
 		}
 	}
-	function dbquery($query) {
-		return mysql_query($query);
-	}
 	function refresh() {
 		header("Location: ".$_SERVER['HTTP_REFERER']);
 	}
 
 	function saveOAuthDetails($user_info, $access_token) {
 		$query = mysql_query("SELECT * FROM ".DBPREFIX."users WHERE oauth_provider = 'twitter' AND oauth_uid = ". $user_info->id);  
-		$result = mysql_fetch_array($query);  
+		$result = mysql_fetch_array($query);
     
 		// If not, let's add it to the database  
 		if(empty($result)){  
@@ -77,14 +73,26 @@
 		$_SESSION['oauth_secret'] = $result['oauth_secret']; 
 		
 	}
-
+	function saveGuess($guess, $user_id) {
+		mysql_query("INSERT INTO ".DBPREFIX."guesses (`guess`, `user_id`, `time`) VALUES ('$guess', '$user_id', '".time()."')");
+		$user = $this->getUser($user_id);
+		if (!empty($user->oauth_secret) && $user->oauth_provider == "twitter") {
+			$message = "@".$user->username." thanks for guessing with the name, ".$guess."! Get your friends to Guess The Royal Baby's name!";
+			if (strlen($message) > 118) {
+				$message = substr($message, 0, 115);
+				$message = $message."...";
+			}
+			$link = " http://www.thisismywebsite-isntgreat.com/thanks";
+			$this->updateTwitter($message.$link);
+		}
+	}
 	function getSettings() {
 		$configs = "SELECT * FROM ".DBPREFIX."site_configs";
 		$result = mysql_query($configs);
 		while($r = mysql_fetch_object($result)) {
 			$output[] = $r;
 		}
-		return $output;
+	return $output;
 	}
 
 	function get_mysql_array($result) {
@@ -96,16 +104,22 @@
 		return $users;
 	}
 	function getUser($id) {
-	global $db;
-		$query = "SELECT * FROM users ";
-		$where = "WHERE user_id='".$id."'";
-		$user = $db->get_results($query.$where);
+		$query = "SELECT * FROM ".DBPREFIX."users WHERE id='".$id."'";
+		$user = $this->get_results($query);
+		$user = $user[0];
 		return $user;
 	}
 	function getTable($thetable) {
 	global $db;
 		$table = $db->get_results("SELECT * FROM ".$thetable);
 		return $table;
+	}
+	function get_results($query) {
+		$result = mysql_query($query);
+		while($r = mysql_fetch_object($result)) {
+			$output[] = $r;
+		}
+		return $output;
 	}
 	function updateUser() {
 	global $db;
@@ -133,8 +147,7 @@
 			$firstname = $_POST['first_name'];
 			$surname = $_POST['surname'];
 			$verifycode = 'verify-'.$username.'-'.md5($email).'-'.md5($firstname).'-talentcow';
-			$query = "INSERT INTO users (username, password, email, first_name, surname, verifycode) VALUES ('$username', '$password', '$email', '$firstname', '$surname', 
-'$verifycode')";
+			$query = "INSERT INTO users (username, password, email, first_name, surname, verifycode) VALUES ('$username', '$password', '$email', '$firstname', '$surname', '$verifycode')";
 			$result = $db->query($query);	
 			if ($result==false)
 				$db->debug();
@@ -313,10 +326,7 @@ limited. All Rights Reserved.<br />
 		  echo "Message sent!";
 		}
 	}
-	function updateTwitter($consumerKey=TWIT_CONSUMER_KEY, $consumerSecret=TWIT_CONSUMER_SECRET, $oAuthToken=TWIT_AUTH_TOKEN, $oAuthSecret=TWIT_AUTH_SECRET, $message){
-	global $db;
-	
-        require_once('twitteroauth.php');
+	function updateTwitter($message, $consumerKey=CONSUMER_KEY, $consumerSecret=CONSUMER_SECRET, $oAuthToken=SITE_OAUTH_TOKEN, $oAuthSecret=SITE_OAUTH_SECRET){
 
         // create a new instance
         $connection = new TwitterOAuth($consumerKey, $consumerSecret, $oAuthToken, $oAuthSecret);
