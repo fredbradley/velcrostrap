@@ -21,7 +21,7 @@
 							<span class="icon-bar"></span>
 							<span class="icon-bar"></span>
 						</button>
-						<a class="brand" href="#">Project name</a>
+						<a class="brand" href="{$cnf->site_uri}">{$cnf->title}</a>
 						<div class="nav-collapse collapse">
 							<ul class="nav pull-right">
 								<li {if {$smarty.server.SCRIPT_NAME}=="/smarty/index.php"}class="active"{/if}><a href="./index.php">Home</a></li>
@@ -35,12 +35,12 @@
 					</div>
 				</div>
 			</div> <!-- // End: .navbar -->
-      
 			<div class="spacer"></div>
 			<!-- Begin page content -->
 			<div class="container">
+				{$message}
 				<div class="page-header clearfix">
-					<h1>Sticky footer with fixed navbar</h1>
+					<h1>Sticky footer with fixed navbars {$update_email}</h1>
 				</div>
 				<p class="lead">Pin a fixed-height footer to the bottom of the viewport in desktop browsers with this custom HTML and CSS. A fixed navbar has been added within <code>#wrap</code> with <code>padding-top: 60px;</code> on the <code>.container</code>.</p>
 				<p>Back to <a href="./sticky-footer.html">the sticky footer</a> minus the navbar.</p>

@@ -53,7 +53,10 @@
 	}
 
 	function saveOAuthDetails($user_info, $access_token) {
-		$query = mysql_query("SELECT * FROM ".DBPREFIX."users WHERE oauth_provider = 'twitter' AND oauth_uid = ". $user_info->id);  
+		$the_query = "SELECT * FROM ".DBPREFIX."users WHERE oauth_provider = 'twitter' AND oauth_uid = ". $user_info->id;
+		$query	= mysql_query($the_query);
+		echo $the_query;
+
 		$result = mysql_fetch_array($query);
     
 		// If not, let's add it to the database  
@@ -72,6 +75,17 @@
 		$_SESSION['oauth_token'] = $result['oauth_token']; 
 		$_SESSION['oauth_secret'] = $result['oauth_secret']; 
 		
+	}
+	function updateProfile() {
+		$query = "UPDATE ".DBPREFIX."users SET email = '{$_POST['email']}' WHERE id='{$_POST['userid']}'";
+		mysql_query($query);
+		return true;
+	}
+	function message($type, $message) {
+//		$output = '<div class="container"><div class='row'><div class='span4'><div class='success'><a class='close' data-dismiss='success'>
+//<div class="alert alert-success">
+
+		return "<div class=\"row\"><div class=\"span12\"><div class=\"alert alert-".$type."\"><h4>".$message."</h4></div></div></div>";
 	}
 	function saveGuess($guess, $user_id) {
 		mysql_query("INSERT INTO ".DBPREFIX."guesses (`guess`, `user_id`, `time`) VALUES ('$guess', '$user_id', '".time()."')");

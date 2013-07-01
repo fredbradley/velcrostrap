@@ -49,12 +49,13 @@ foreach($siteconfigs as $site_config) {
 	// This is instead of having a language file!
 	define($site_config->name, $site_config->value);
 }
-
+// Get Static Language File
 define("FULL_PATH_TO_SMARTY", $SITE_PATH.PATH_TO_SMARTY);
 // Get Smarty Class, then load
 // ("PATH_TO_SMARTY" is called from the database above)
 require_once(FULL_PATH_TO_SMARTY);
 $smarty = new Smarty;
+require_once($SITE_PATH."includes/language.php");
 
 /* TWITTER OAUTH STUFF */
 require_once($SITE_PATH."includes/twitteroauth.php");
@@ -62,7 +63,9 @@ if ($cms->logged_in()){
     $twitteroauth = new TwitterOAuth(CONSUMER_KEY, CONSUMER_SECRET, $_SESSION['oauth_token'], $_SESSION['oauth_secret']);
     $user = $cms->getUser($_SESSION['id']);
     if (empty($user->email)) {
-	    $smarty->assign("update_email", true);
+	$smarty->assign("update_email", "YES");
+    } else {
+	$smarty->assign("update_email", "NO");
     }
 //  $message = "This is a test tweet! (Yes I'm coding again!)".time();
 //	$cms->updateTwitter($message);
